@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row gap-6" x-data="{ tab: 'ringkasan' }">
+    <!-- Sidebar -->
+    <div class="md:w-64 flex-shrink-0">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 rounded-full bg-gradient-primary text-white flex items-center justify-center text-xl font-bold">
+                    {{ request.user.username|make_list|first|upper }}
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">{{ request.user.profile.store_name|default:request.user.username|title }}</h3>
+                    <p class="text-xs text-gray-500">Seller Dashboard</p>
+                </div>
+            </div>
+            
+            <nav class="space-y-2">
+                <button @click="tab = 'ringkasan'" :class="tab === 'ringkasan' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
+                    <i class="fas fa-chart-pie w-5"></i> Ringkasan
+                </button>
+                <button @click="tab = 'produk'" :class="tab === 'produk' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
+                    <i class="fas fa-box w-5"></i> Kelola Produk
+                </button>
+                <button @click="tab = 'pesanan'" :class="tab === 'pesanan' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
+                    <i class="fas fa-clipboard-list w-5"></i> Pesanan <span class="ml-auto bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{{ new_orders }}</span>
+                </button>
+                <a href="{% url 'chat_seller' %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary font-medium rounded-xl transition text-left">
+                    <i class="fas fa-comments w-5"></i> Pesan
+                </a>
+                <button @click="tab = 'pengaturan'" :class="tab === 'pengaturan' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition mt-4 border-t border-gray-100 pt-5 text-left">
+                    <i class="fas fa-cog w-5"></i> Pengaturan
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow space-y-6">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="bg-green-50 text-green-600 font-bold p-4 rounded-2xl border border-green-100">
+                <i class="fas fa-check-circle mr-2"></i> {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Tab Ringkasan -->
+        <div x-show="tab === 'ringkasan'" x-transition.opacity>
+            <h1 class="text-2xl font-extrabold text-gray-800 mb-6">Ringkasan Toko</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <p class="text-sm text-gray-500 font-medium mb-1">Pesanan (Item)</p>
+                    <h3 class="text-3xl font-extrabold text-blue-600">{{ new_orders }}</h3>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <p class="text-sm text-gray-500 font-medium mb-1">Total Pendapatan</p>
+                    <h3 class="text-3xl font-extrabold text-green-600">Rp {{ revenue|floatformat:"0" }}</h3>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <p class="text-sm text-gray-500 font-medium mb-1">Total Produk</p>
+                    <h3 class="text-3xl font-extrabold text-purple-600">{{ total_products }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Produk -->
+        <div x-show="tab === 'produk'" x-cloak x-transition.opacity>
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h3 class="font-bold text-lg text-gray-800">Daftar Produk Saya</h3>
+                    <button @click="$dispatch('open-add-product')" class="bg-gradient-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:shadow-lg transition">
+                        <i class="fas fa-plus mr-1"></i> Tambah Produk
+                    </button>
+                </div>
+                <!-- Add Product Form (Hidden by default, triggered by Alpine) -->
+                <div x-data="{ open: false }" @open-add-product.window="open = true" class="bg-white border-b border-gray-100 pb-4">
+                    <div x-show="open" x-transition class="p-6 bg-orange-50/30">
+                        <h4 class="font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-plus-circle text-primary"></i> Tambah Produk Baru</h4>
+                        <form method="POST" action="{% url 'seller_dashboard' %}" enctype="multipart/form-data" class="grid grid-cols-2 gap-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_product">
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Nama Produk</label>
+                                <input type="text" name="name" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Kategori</label>
+                                <select name="category" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                                    <option value="">Pilih Kategori...</option>
+                                    {% for c in categories %}
+                                    <option value="{{ c.id }}">{{ c.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Harga (Rp)</label>
+                                <input type="number" name="price" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Stok</label>
+                                <input type="number" name="stock" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Upload Foto Produk</label>
+                                <input type="file" name="image" accept="image/*" class="w-full border-gray-200 border rounded-lg bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-orange-600 p-1">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Deskripsi</label>
+                                <textarea name="description" rows="3" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white"></textarea>
+                            </div>
+                            <div class="col-span-2 flex justify-end gap-2 mt-2">
+                                <button type="button" @click="open = false" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 font-bold hover:bg-gray-100">Batal</button>
+                                <button type="submit" class="px-4 py-2 btn-primary rounded-lg font-bold">Simpan Produk</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-600">
+                        <thead class="bg-gray-50 border-b border-gray-100 text-gray-700">
+                            <tr>
+                                <th class="px-6 py-4 font-bold">Produk</th>
+                                <th class="px-6 py-4 font-bold">Harga</th>
+                                <th class="px-6 py-4 font-bold">Stok</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            {% for product in my_products %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <img src="{{ product.get_image }}" class="w-12 h-12 rounded-lg object-cover border border-gray-200">
+                                    <div>
+                                        <p class="font-bold text-gray-800 line-clamp-1">{{ product.name }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 font-bold text-secondary">Rp {{ product.price|floatformat:"0" }}</td>
+                                <td class="px-6 py-4 font-bold">{{ product.stock }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Belum ada produk.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Pesanan -->
+        <div x-show="tab === 'pesanan'" x-cloak x-transition.opacity>
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                <div class="p-6 border-b border-gray-100 bg-gray-50">
+                    <h3 class="font-bold text-lg text-gray-800">Daftar Transaksi (Item)</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    {% for item in recent_order_items %}
+                    <div class="flex flex-wrap md:flex-nowrap justify-between items-center gap-4 p-4 border border-gray-100 rounded-2xl">
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-box text-3xl text-gray-300"></i>
+                            <div>
+                                <p class="font-bold text-gray-800">Order #{{ item.order.id }} <span class="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded ml-2">Pembeli: {{ item.order.user.username }}</span></p>
+                                <p class="text-sm font-medium text-gray-700 mt-1 line-clamp-1">{{ item.product.name }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ item.quantity }} x Rp {{ item.price|floatformat:"0" }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <span class="bg-blue-50 text-blue-600 font-bold text-xs px-3 py-1 rounded-full uppercase mb-2">{{ item.order.status }}</span>
+                            <a href="{% url 'order_detail' item.order.id %}" class="bg-primary hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-lg transition shadow-sm">Ubah Status Detail</a>
+                            <p class="font-extrabold text-secondary mt-2 text-lg">Rp {% widthratio item.price 1 item.quantity %}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-center text-gray-400 py-4">Belum ada pesanan masuk.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Pengaturan -->
+        <div x-show="tab === 'pengaturan'" x-cloak x-transition.opacity>
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6 p-6 lg:p-10 max-w-lg">
+                <h3 class="font-bold text-xl text-gray-800 mb-6 border-b pb-4"><i class="fas fa-lock text-primary mr-2"></i> Ubah Password</h3>
+                <form method="POST" action="{% url 'seller_dashboard' %}" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Password Baru</label>
+                        <input type="password" name="new_password" required class="w-full border-gray-200 bg-gray-50 border rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full btn-primary py-3 rounded-xl font-bold mt-4 shadow-sm">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

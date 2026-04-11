@@ -1,0 +1,92 @@
+<nav x-data="{ mobileMenuOpen: false }" class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="/" class="text-2xl font-bold text-gradient flex items-center gap-2">
+            <i class="fas fa-shopping-bag text-secondary"></i> Shopiviy
+        </a>
+        
+        <!-- Search bar (Desktop) -->
+        <form action="{% url 'home' %}" method="GET" class="hidden md:flex flex-grow max-w-xl mx-8 relative shadow-sm">
+            <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Cari produk eksklusif..." class="w-full px-5 py-2.5 bg-gray-50 border border-gray-200 rounded-l-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 transition">
+            <button type="submit" class="bg-gradient-primary px-6 rounded-r-xl text-white font-bold hover:shadow-lg transition"><i class="fas fa-search"></i></button>
+        </form>
+
+        <!-- Right Menu -->
+        <div class="hidden md:flex items-center gap-6">
+            <!-- <a href="{% url 'home' %}" class="hover:text-secondary transition font-medium text-sm">Home</a> -->
+            <!-- <a href="{% url 'product_list' %}" class="hover:text-secondary transition font-medium text-sm">Produk</a> -->
+            
+            {% if request.user.is_authenticated %}
+                {% if request.user.profile.is_seller %}
+                <a href="{% url 'seller_dashboard' %}" class="text-primary hover:text-secondary font-bold text-sm transition bg-primary/10 px-3 py-1 rounded-full"><i class="fas fa-store mr-1"></i>Toko Saya</a>
+                {% endif %}
+                
+                <div class="h-6 w-px bg-gray-200"></div>
+                
+                <a href="{% url 'cart' %}" class="relative hover:text-secondary transition flex items-center group">
+                    <i class="fas fa-shopping-cart text-xl text-gray-600 group-hover:text-secondary transition"></i>
+                    <span class="absolute -top-2 -right-2 bg-red-500 border-2 border-white text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">{{ request.user.cart.items.count|default:"0" }}</span>
+                </a>
+                
+                <!-- User Dropdown (Simple) -->
+                <div class="relative group" x-data="{ userMenu: false }">
+                    <button @click="userMenu = !userMenu" @click.away="userMenu = false" class="flex items-center gap-2 font-bold text-sm text-gray-700 hover:text-primary transition focus:outline-none">
+                        <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=random" class="w-8 h-8 rounded-full border border-gray-200">
+                        {{ request.user.username }} <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <!-- Dropdown Content -->
+                    <div x-show="userMenu" x-transition.opacity x-cloak class="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 z-50">
+                        <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"><i class="fas fa-user w-5"></i> Profil</a>
+                        <a href="{% url 'order_list' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"><i class="fas fa-clipboard-list w-5"></i> Pesanan Saya</a>
+                        <hr class="my-2 border-gray-100">
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-50 font-bold"><i class="fas fa-sign-out-alt w-5"></i> Keluar</a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="h-6 w-px bg-gray-200"></div>
+                <a href="{% url 'login' %}" class="relative hover:text-secondary transition flex items-center group">
+                    <i class="fas fa-shopping-cart text-xl text-gray-600 group-hover:text-secondary transition"></i>
+                </a>
+                <a href="{% url 'login' %}" class="btn-primary px-5 py-2 text-sm rounded-xl font-bold shadow-sm">Login</a>
+            {% endif %}
+        </div>
+
+        <!-- Mobile menu button -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-gray-600 focus:outline-none p-2">
+            <i class="fas fa-bars text-xl" x-show="!mobileMenuOpen"></i>
+            <i class="fas fa-times text-xl" x-show="mobileMenuOpen" x-cloak></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu dropdown -->
+    <div x-show="mobileMenuOpen" x-cloak x-transition.opacity class="md:hidden border-t border-gray-100 bg-white pb-4">
+        <div class="px-4 py-4 space-y-4">
+            <form action="{% url 'home' %}" method="GET" class="w-full relative shadow-sm">
+                <input type="text" name="q" value="{{ search_query|default:'' }}" placeholder="Cari produk..." class="w-full px-4 py-2 border border-gray-200 rounded-l-xl focus:outline-none focus:border-primary">
+                <button type="submit" class="absolute right-0 top-0 h-full bg-gradient-primary px-4 rounded-r-xl text-white"><i class="fas fa-search"></i></button>
+            </form>
+            <!-- <a href="{% url 'product_list' %}" class="block font-medium hover:text-secondary"><i class="fas fa-box w-6"></i> Produk</a> -->
+            <a href="{% url 'cart' %}" class="block font-medium hover:text-secondary flex justify-between">
+                <span><i class="fas fa-shopping-cart w-6"></i> Keranjang</span>
+                {% if request.user.is_authenticated %}
+                <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ request.user.cart.items.count|default:"0" }}</span>
+                {% endif %}
+            </a>
+            
+            {% if request.user.is_authenticated %}
+                {% if request.user.profile.is_seller %}
+                <a href="{% url 'seller_dashboard' %}" class="block font-medium text-primary hover:text-secondary bg-primary/5 px-2 py-1 rounded"><i class="fas fa-store w-6"></i> Toko Saya</a>
+                {% endif %}
+                <hr class="border-gray-100">
+                <div class="flex items-center gap-3 py-2">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=random" class="w-8 h-8 rounded-full border border-gray-200">
+                    <span class="font-bold text-gray-800">{{ request.user.username }}</span>
+                </div>
+                <a href="{% url 'order_list' %}" class="block font-medium text-gray-600 hover:text-primary"><i class="fas fa-clipboard-list w-6"></i> Pesanan Saya</a>
+                <a href="{% url 'logout' %}" class="block text-center bg-red-50 text-red-500 w-full py-2 rounded-xl font-bold mt-4 border border-red-100 hover:bg-red-100"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="block text-center btn-primary w-full py-3 rounded-xl font-bold mt-4 shadow-sm">Masuk / Daftar</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

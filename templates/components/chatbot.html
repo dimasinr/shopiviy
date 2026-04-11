@@ -1,0 +1,106 @@
+<!-- Floating Chatbot -->
+<div x-data="chatbot()" x-init="$watch('messages', () => scrollToBottom())" class="fixed bottom-6 right-6 z-50">
+    <!-- Chat Icon -->
+    <button @click="open = !open" class="btn-primary w-14 h-14 rounded-full flex items-center justify-center shadow-[0_10px_20px_rgba(255,152,0,0.3)] hover:scale-105 transition-transform">
+        <i class="fas fa-comment-dots text-2xl text-white" x-show="!open"></i>
+        <i class="fas fa-times text-2xl text-white" x-show="open" x-cloak></i>
+    </button>
+
+    <!-- Chat Window -->
+    <div x-show="open" x-transition.opacity.scale.origin.bottom.right x-cloak class="absolute bottom-16 right-0 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden mb-4 flex flex-col h-[400px]">
+        <!-- Header -->
+        <div class="bg-gradient-primary p-4 text-white flex items-center gap-3">
+            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <i class="fas fa-robot text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold">ShopiBot</h3>
+                <p class="text-[10px] opacity-90 inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-400"></span> Asisten Aktif</p>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="shopibot-container" class="flex-grow p-4 overflow-y-auto bg-gray-50/50 space-y-4 text-sm bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-10">
+            <template x-for="(msg, index) in messages" :key="index">
+                <!-- Wrapper to return either Bot Bubble or User Bubble based on Condition -->
+                <div class="w-full">
+                    <!-- Bot message -->
+                    <template x-if="msg.type === 'bot'">
+                        <div class="flex items-start gap-2 max-w-[85%]">
+                            <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <i class="fas fa-robot text-xs"></i>
+                            </div>
+                            <div class="bg-white p-3 rounded-2xl rounded-tl-sm border border-gray-100 shadow-sm text-gray-700" x-html="msg.text"></div>
+                        </div>
+                    </template>
+
+                    <!-- User message -->
+                    <template x-if="msg.type === 'user'">
+                        <div class="flex justify-end w-full">
+                            <div class="flex items-end gap-2 max-w-[85%] flex-row-reverse">
+                                <div class="bg-gradient-primary text-white p-3 rounded-2xl rounded-br-sm shadow-sm" x-text="msg.text"></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- Input -->
+        <form @submit.prevent="sendMessage()" class="p-3 bg-white border-t border-gray-100 flex items-center gap-2 m-0">
+            <input type="text" x-model="userInput" placeholder="Tanya sesuatu..." class="flex-grow bg-gray-100 px-4 py-2.5 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary shadow-inner">
+            <button type="submit" class="w-10 h-10 rounded-full text-white bg-secondary hover:bg-orange-600 transition flex items-center justify-center shadow-md hover:shadow-lg flex-shrink-0">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function chatbot() {
+    return {
+        open: false,
+        userInput: '',
+        messages: [
+            { type: 'bot', text: 'Teeett... Bip! Halo, Saya ShopiBot 🤖.<br><br>Ada yang bisa saya bantu terkait fitur platform E-Commerce Shopiviy hari ini?' }
+        ],
+        sendMessage() {
+            if (this.userInput.trim() === '') return;
+            
+            const text = this.userInput;
+            this.messages.push({ type: 'user', text: text });
+            this.userInput = '';
+            
+            setTimeout(() => this.generateReply(text), 600);
+        },
+        generateReply(text) {
+            const t = text.toLowerCase();
+            let reply = "Maaf, ShopiBot masih belajar 😅. Coba tanyakan tentang **resi, cara buka toko seller, metode bayar (COD/QRIS), ongkir, atau apa itu shopiviy**!";
+            
+            if (t.includes('apa itu') || t.includes('shopiviy') || t.includes('siapa')) {
+                reply = "<b>Shopiviy</b> adalah platform E-Commerce pintar berbasis Django masa kini! Kamu dapat berbelanja produk eksklusif atau menjadi penjual dengan *Seller Dashboard* yang super responsif.";
+            } else if (t.includes('resi') || t.includes('lacak') || t.includes('pengiriman')) {
+                reply = "Untuk mengecek resi pengiriman, kamu cukup ke menu <b>Profil</b> > <b>Pesanan Saya</b>, dan klik Detail Invoice. Resi dari kurir seller akan tertera di sana!";
+            } else if (t.includes('bayar') || t.includes('metode') || t.includes('cod') || t.includes('qris')) {
+                reply = "Shopiviy sangat modern! Kami mendukung <b>QRIS</b> (Scan dengan e-wallet) dan <b>COD</b> (Bayar tunai di tempat saat barang terima dari kurir).";
+            } else if (t.includes('ongkir') || t.includes('ongkos') || t.includes('gratis')) {
+                reply = "Asyik banget! Saat ini kami mensubsidi <b>Gratis Ongkir</b> ke seluruh rute. Jadi biayanya otomatis Rp 0 saat sistem mencetak invoice Checkoutmu.";
+            } else if (t.includes('toko') || t.includes('jual') || t.includes('seller')) {
+                reply = "Tertarik jualan? Gampang! Kapanpun saat Register akun baru, pilih rolenya sebagai <b>Penjual</b>. Kamu akan disuguhkan <i>Seller Dashboard</i> canggih untuk upload produk!";
+            } else if (t.includes('halo') || t.includes('hai') || t.includes('pagi') || t.includes('sore') || t.includes('malam') || t.includes('ping')) {
+                reply = "Hai juga kak! Selamat datang di Shopiviy. Beli banyak untung banyak, mau belanja apa kita hari ini?";
+            } else if (t.includes('pass') || t.includes('kata sandi')) {
+                reply = "Kamu kelupaan password? Kalau kamu Penjual, kamu bisa ganti passwordmu melalui panel <b>Pengaturan</b> di Dashboard Seller kok.";
+            }
+            
+            this.messages.push({ type: 'bot', text: reply });
+        },
+        scrollToBottom() {
+            setTimeout(() => {
+                const el = document.getElementById('shopibot-container');
+                if(el) el.scrollTop = el.scrollHeight;
+            }, 50);
+        }
+    }
+}
+</script>

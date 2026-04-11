@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Shopiviy{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FFC107',
+                        secondary: '#FF9800',
+                        accent: '#FFB300',
+                        bglight: '#f9f9f9',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- AlpineJS for interaction -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f9f9f9; }
+        .bg-gradient-primary { background: linear-gradient(135deg, #FFC107, #FF9800); }
+        .text-gradient { background: linear-gradient(135deg, #FFC107, #FF9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-primary { background: linear-gradient(135deg, #FFC107, #FF9800); color: white; transition: all 0.3s ease; }
+        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="text-gray-800 font-sans flex flex-col min-h-screen">
+    {% include 'components/navbar.html' %}
+    
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'components/chatbot.html' %}
+
+    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Shopiviy. All rights reserved. Designed with modern clean aesthetic.</p>
+    </footer>
+</body>
+</html>

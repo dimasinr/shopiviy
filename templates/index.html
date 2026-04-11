@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-primary rounded-3xl p-8 md:p-12 text-white shadow-lg mb-12 flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
+    <!-- Decor circles -->
+    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-0 left-10 w-32 h-32 bg-white opacity-10 rounded-full blur-xl"></div>
+    
+    <div class="md:w-1/2 mb-8 md:mb-0 relative z-10">
+        <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4 backdrop-blur-sm">Promo Terbatas</span>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight">Diskon Spesial<br>Hingga 50%</h1>
+        <p class="text-lg mb-8 opacity-90 leading-relaxed font-light">Temukan berbagai barang impianmu dengan kualitas terbaik dan harga pas di kantong. Belanja makin hemat di Shopiviy!</p>
+        <!-- <button class="bg-white text-secondary font-bold py-3 px-8 rounded-xl shadow-md hover:bg-gray-50 transition transform hover:scale-105 active:scale-95 inline-flex items-center gap-2">
+            Belanja Sekarang <i class="fas fa-arrow-right"></i>
+        </button> -->
+    </div>
+    <div class="md:w-5/12 flex justify-center relative z-10 w-full">
+        <!-- Mockup Visual -->
+        <div class="bg-white/20 border border-white/30 rounded-2xl w-full max-w-sm h-64 flex items-center justify-center backdrop-blur-md shadow-xl transform rotate-2 hover:rotate-0 transition duration-500">
+            <div class="text-center">
+                <i class="fas fa-gift text-6xl mb-4 opacity-90 drop-shadow-lg"></i>
+                <h3 class="text-2xl font-bold font-serif opacity-90">Shopiviy Sale!</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories -->
+<div class="mb-12">
+    <div class="flex justify-between items-end mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Kategori Pilihan</h2>
+    </div>
+    <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+        <!-- Cat Item -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-tshirt text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Pakaian</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-mobile-alt text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Elektronik</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-couch text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Rumah</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-basketball-ball text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Olahraga</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden md:flex">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-laptop text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Komputer</p>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden lg:flex">
+            <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
+                <i class="fas fa-headphones text-xl text-secondary"></i>
+            </div>
+            <p class="font-semibold text-gray-700 text-sm">Aksesoris</p>
+        </div>
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div>
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Rekomendasi Untukmu</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+        <!-- Render products dynamically -->
+        {% for prod in db_products %}
+        <a href="{% url 'product_detail' prod.id %}" class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover border border-gray-100 flex flex-col group relative block">
+            {% if forloop.first %}
+            <!-- Badge untuk produk pertama saja simulasi diskon -->
+            <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">-20%</div>
+            {% endif %}
+            <!-- Image Area -->
+            <div class="relative overflow-hidden w-full pt-[100%] bg-gray-50">
+                <img src="{{ prod.image_url|default:'https://via.placeholder.com/400' }}" alt="{{ prod.name }}" class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+            </div>
+            <!-- Info Area -->
+            <div class="p-4 flex-grow flex flex-col">
+                <p class="text-xs text-gray-400 mb-1 line-clamp-1">{{ prod.seller.profile.store_name|default:prod.seller.username }}</p>
+                <h3 class="font-medium text-gray-700 mb-1 line-clamp-2 text-sm leading-snug group-hover:text-secondary transition">{{ prod.name }}</h3>
+                <div class="mt-1 mb-2">
+                    <p class="text-secondary font-extrabold text-lg leading-none">Rp {{ prod.price|floatformat:"0" }}</p>
+                </div>
+                <div class="mt-auto pt-2 flex justify-between items-center w-full">
+                    <div class="text-xs text-gray-500 flex items-center font-medium">
+                        <i class="fas fa-star text-yellow-500 mr-1"></i> 4.9 <span class="mx-1">|</span> Stok: {{ prod.stock }}
+                    </div>
+                </div>
+            </div>
+            <!-- Hover Add to cart button -->
+            <form action="{% url 'add_to_cart' prod.id %}" method="POST" class="absolute bottom-4 right-4 z-20">
+                {% csrf_token %}
+                <button type="submit" class="w-9 h-9 bg-secondary text-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition shadow-lg hover:scale-110">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </a>
+        {% empty %}
+        <p class="col-span-full text-center py-10 text-gray-400">Belum ada produk. Silahkan tambah melalui seller dashboard.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

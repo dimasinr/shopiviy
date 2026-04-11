@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="text-sm text-gray-500 mb-6 flex items-center gap-2">
+    <a href="/" class="hover:text-primary transition">Home</a>
+    <i class="fas fa-chevron-right text-xs"></i>
+    <span class="hover:text-primary transition">{{ product.category.name|default:"Uncategorized" }}</span>
+    <i class="fas fa-chevron-right text-xs"></i>
+    <span class="text-gray-800 font-medium truncate max-w-xs">{{ product.name }}</span>
+</div>
+
+<div class="bg-white p-6 md:p-8 lg:p-10 rounded-3xl shadow-sm border border-gray-100 mb-10">
+    <div class="flex flex-col lg:flex-row gap-10">
+        <!-- Image Area -->
+        <div class="lg:w-5/12">
+            <div class="rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-inner group relative">
+                <img src="{{ product.get_image }}" class="w-full h-auto aspect-square object-cover transition-transform duration-500 group-hover:scale-110">
+            </div>
+        </div>
+        
+        <!-- Details -->
+        <div class="lg:w-7/12 flex flex-col pt-2">
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-800 mb-3 leading-tight">{{ product.name }}</h1>
+            
+            <div class="flex flex-wrap items-center gap-4 mb-6 text-sm divide-x divide-gray-200">
+                <span class="text-green-500 font-medium"><i class="fas fa-check-circle mr-1"></i> Stok Terbatas: {{ product.stock }}</span>
+            </div>
+            
+            <div class="mb-8">
+                <p class="text-4xl md:text-5xl font-extrabold text-secondary mb-2">Rp {{ product.price|floatformat:"0" }}</p>
+            </div>
+            
+            <div class="mb-8 flex-grow">
+                <h3 class="font-bold text-gray-800 mb-3 text-lg border-b pb-2">Deskripsi Produk</h3>
+                <div class="text-gray-600 leading-relaxed text-sm space-y-4">
+                    {{ product.description|linebreaks }}
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <form action="{% url 'add_to_cart' product.id %}" method="POST" x-data="{ qty: 1, maxQty: {{ product.stock|default:1 }} }" class="pt-6 border-t border-gray-100 flex flex-wrap gap-4 sticky bottom-0 bg-white/95 backdrop-blur-sm z-20 py-4 md:static md:bg-transparent md:z-auto">
+                {% csrf_token %}
+                <div class="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm h-14">
+                    <button type="button" @click="if(qty > 1) qty--" class="w-12 h-full flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 transition border-r border-gray-200"><i class="fas fa-minus"></i></button>
+                    <input type="number" name="quantity" x-model="qty" readonly class="w-16 h-full text-center text-lg font-extrabold border-none outline-none text-gray-800 bg-transparent">
+                    <button type="button" @click="if(qty < maxQty) qty++" class="w-12 h-full flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 transition border-l border-gray-200"><i class="fas fa-plus"></i></button>
+                </div>
+                {% if request.user.is_authenticated %}
+                <button type="submit" class="flex-1 btn-primary py-3 h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 hover:scale-105 active:scale-95 transition">
+                    <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
+                </button>
+                {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="flex-1 bg-gray-800 text-white py-3 h-14 rounded-xl font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition">
+                    <i class="fas fa-sign-in-alt"></i> Login untuk Membeli
+                </a>
+                {% endif %}   
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Seller Info -->
+<div class="bg-white rounded-3xl p-6 border border-gray-100 flex items-center gap-6 mb-10 shadow-sm">
+    <img src="https://ui-avatars.com/api/?name={{ product.seller.username }}&background=random" class="w-16 h-16 rounded-full border border-gray-200">
+    <div class="flex-grow">
+        <h3 class="font-bold text-lg text-gray-800">{{ product.seller.profile.store_name|default:product.seller.username }}</h3>
+        <p class="text-sm text-gray-500"><i class="fas fa-store mr-1"></i> Partner Shopiviy</p>
+    </div>
+    <div class="flex gap-3">
+        {% if request.user.is_authenticated and request.user != product.seller %}
+        <a href="{% url 'chat_seller' product.seller.id %}" class="px-6 py-2 border border-secondary text-secondary rounded-lg font-bold hover:bg-secondary/10 transition"><i class="fas fa-comment-alt mr-2"></i> Chat Penjual</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
