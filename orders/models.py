@@ -20,6 +20,7 @@ class Order(models.Model):
     
     invoice_number = models.CharField(max_length=50, blank=True, null=True, unique=True)
     tracking_number = models.CharField(max_length=100, blank=True, null=True)
+    payment_proof = models.ImageField(upload_to='payment_proofs/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:

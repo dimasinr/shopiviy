@@ -55,9 +55,14 @@ def checkout(request):
     total = sum(item.product.price * item.quantity for item in items)
     
     if request.method == 'POST':
+        try:
+            shipping_cost = int(request.POST.get('shipping_cost', 0))
+        except ValueError:
+            shipping_cost = 0
+            
         order = Order.objects.create(
             user=request.user,
-            total_price=total,
+            total_price=total + shipping_cost,
             shipping_address=request.POST.get('address', 'Alamat Dummy')
         )
         for item in items:
@@ -73,13 +78,18 @@ def checkout(request):
 def payment(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     if request.method == 'POST':
-        payment_method = request.POST.get('payment', 'qris')
+        payment_method = request.POST.get('payment', 'bank_transfer')
         order.payment_method = payment_method
-        # COD doesn't mean it's paid immediately
-        # if payment_method == 'cod':
-        #     order.status = 'pending'
-        # else:
-        order.status = 'paid'
+        
+        if payment_method == 'bank_transfer':
+            if 'payment_proof' in request.FILES:
+                order.payment_proof = request.FILES['payment_proof']
+                order.status = 'paid'
+            else:
+                # Optional: Handle missing file gracefully, though HTML5 handles it
+                order.status = 'pending'
+        else:
+            order.status = 'paid'
             
         order.save()
         return redirect('order_detail', order_id=order.id)

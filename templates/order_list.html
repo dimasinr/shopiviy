@@ -34,7 +34,7 @@
                 <!-- Grouping items in the order -->
                 {% for item in order.items.all %}
                 <div class="flex gap-4 mb-4">
-                    <img src="{{ item.product.image_url|default:'https://via.placeholder.com/200' }}" class="w-20 h-20 rounded-xl object-cover border border-gray-100">
+                    <img src="{{ item.product.get_image }}" class="w-20 h-20 rounded-xl object-cover border border-gray-100">
                     <div class="flex-grow flex flex-col justify-center">
                         <h3 class="font-bold text-gray-800 line-clamp-1">{{ item.product.name }}</h3>
                         <p class="text-sm text-gray-500 mt-1">{{ item.quantity }} barang x Rp {{ item.price|floatformat:"0" }}</p>

@@ -18,7 +18,7 @@
             <div class="p-6 space-y-6">
                 {% for item in cart_items %}
                 <div class="flex gap-4">
-                    <img src="{{ item.product.image_url|default:'https://via.placeholder.com/200' }}" class="w-24 h-24 rounded-xl object-cover border border-gray-100">
+                    <img src="{{ item.product.get_image }}" class="w-24 h-24 rounded-xl object-cover border border-gray-100">
                     <div class="flex-grow flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-gray-800 line-clamp-1">{{ item.product.name }}</h3>

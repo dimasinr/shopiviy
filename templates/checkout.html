@@ -12,7 +12,15 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="font-bold text-xl text-gray-800 flex items-center gap-2"><i class="fas fa-map-marker-alt text-primary"></i> Alamat Pengiriman</h2>
             </div>
-            <textarea name="address" required rows="3" placeholder="Tulis rincian alamat tujuan pengiriman Anda lengkap..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 focus:ring-1 focus:ring-primary focus:outline-none"></textarea>
+            <textarea name="address" required rows="3" placeholder="Tulis rincian alamat tujuan pengiriman Anda lengkap..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 focus:ring-1 focus:ring-primary focus:outline-none mb-4"></textarea>
+            
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <h3 class="font-bold text-blue-800 mb-2 text-sm"><i class="fas fa-location-arrow"></i> Hitung Jarak & Ongkir</h3>
+                <p class="text-xs text-blue-600 mb-3">Toko berada di Tangerang Selatan. Ongkir: Rp 2.000 / km. Anda harus mengaktifkan lokasi.</p>
+                <button type="button" id="btn-location" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition" onclick="getLocation()">Klik Untuk Cek Lokasi Anda</button>
+                <div id="location-status" class="text-xs mt-2 font-medium text-gray-600"></div>
+                <input type="hidden" name="shipping_cost" id="shipping_cost" value="0">
+            </div>
         </div>
 
         <!-- Orders -->
@@ -22,7 +30,7 @@
             
             {% for item in cart_items %}
             <div class="flex gap-4 mb-4">
-                <img src="{{ item.product.image_url|default:'https://via.placeholder.com/100' }}" class="w-16 h-16 rounded-lg object-cover border border-gray-100">
+                <img src="{{ item.product.get_image }}" class="w-16 h-16 rounded-lg object-cover border border-gray-100">
                 <div class="flex-grow">
                     <h4 class="font-bold text-gray-800 line-clamp-1 text-sm">{{ item.product.name }}</h4>
                     <p class="text-xs text-gray-500 mb-1">Total: {{ item.quantity }} Barang</p>
@@ -32,8 +40,8 @@
                 </div>
             </div>
             {% endfor %}
-            <div class="mt-4 bg-green-50 text-green-600 rounded-lg p-3 text-xs font-bold text-center border border-green-100">
-                <i class="fas fa-truck mr-1"></i> Ekspedisi standar otomatis dipilih (Gratis Ongkir!)
+            <div class="mt-4 bg-blue-50 text-blue-600 rounded-lg p-3 text-xs font-bold text-center border border-blue-100" id="ekspedisi-text">
+                <i class="fas fa-motorcycle mr-1"></i> Ongkir akan dihitung berdasarkan jarak
             </div>
         </div>
         
@@ -53,7 +61,7 @@
                     </div>
                     <div class="flex justify-between text-gray-600">
                         <span>Biaya Pengiriman</span>
-                        <span class="text-green-500 font-medium">Rp 0 (Subsidi)</span>
+                        <span class="text-gray-800 font-medium" id="shipping-display">Dihitung dari Lokasi</span>
                     </div>
                 </div>
                 
@@ -61,13 +69,83 @@
                 
                 <div class="flex justify-between items-center mb-6">
                     <span class="font-bold text-gray-800">Total Tagihan</span>
-                    <span class="font-extrabold text-2xl text-secondary">Rp {{ total|floatformat:"0" }}</span>
+                    <span class="font-extrabold text-2xl text-secondary" id="total-display">Rp {{ total|floatformat:"0" }}</span>
                 </div>
-                <button type="submit" class="block w-full btn-primary text-center py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                <button type="submit" id="btn-checkout" class="block w-full btn-primary text-center py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex justify-center items-center gap-2 opacity-50 cursor-not-allowed" disabled>
                     Lanjut Pilih Pembayaran
                 </button>
             </div>
         </div>
     </div>
 </form>
+</form>
+
+<script>
+    const TOKO_LAT = -6.28862; // Tangerang Selatan Lat
+    const TOKO_LNG = 106.71789; // Tangerang Selatan Lng
+    const TOTAL_BARANG = parseInt("{{ total|floatformat:'0' }}");
+    
+    function distance(lat1, lon1, lat2, lon2) {
+      if ((lat1 == lat2) && (lon1 == lon2)) {
+        return 0;
+      }
+      else {
+        var radlat1 = Math.PI * lat1/180;
+        var radlat2 = Math.PI * lat2/180;
+        var theta = lon1-lon2;
+        var radtheta = Math.PI * theta/180;
+        var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        if (dist > 1) {
+            dist = 1;
+        }
+        dist = Math.acos(dist);
+        dist = dist * 180/Math.PI;
+        dist = dist * 60 * 1.1515;
+        dist = dist * 1.609344;
+        return dist;
+      }
+    }
+
+    function getLocation() {
+        const btn = document.getElementById('btn-location');
+        const status = document.getElementById('location-status');
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                const dist = distance(TOKO_LAT, TOKO_LNG, lat, lng);
+                const ongkir = Math.ceil(dist) * 2000;
+                
+                document.getElementById('shipping_cost').value = ongkir;
+                document.getElementById('shipping-display').innerText = 'Rp ' + ongkir.toLocaleString('id-ID');
+                
+                const grandTotal = TOTAL_BARANG + ongkir;
+                document.getElementById('total-display').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+                
+                status.innerHTML = `<span class="text-green-600"><i class="fas fa-check-circle"></i> Berhasil! Jarak Anda ${dist.toFixed(1)} km.</span>`;
+                btn.innerHTML = '<i class="fas fa-check"></i> Lokasi Ditemukan';
+                btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                
+                document.getElementById('ekspedisi-text').innerHTML = `<i class="fas fa-motorcycle mr-1"></i> Ongkir Rp ${ongkir.toLocaleString('id-ID')} (${dist.toFixed(1)} km)`;
+                
+                // Enable checkout button
+                const btnCheckout = document.getElementById('btn-checkout');
+                btnCheckout.disabled = false;
+                btnCheckout.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+            }, function(error) {
+                status.innerHTML = '<span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Gagal ambil lokasi. Tolong izinkan akses lokasi di browser.</span>';
+                btn.innerHTML = '<i class="fas fa-location-arrow"></i> Coba Lagi';
+            });
+        } else {
+            status.innerHTML = '<span class="text-red-500">Browser tidak support Geolocation.</span>';
+            btn.innerHTML = '<i class="fas fa-location-arrow"></i> Coba Lagi';
+        }
+    }
+</script>
 {% endblock %}

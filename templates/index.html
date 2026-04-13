@@ -85,7 +85,7 @@
             {% endif %}
             <!-- Image Area -->
             <div class="relative overflow-hidden w-full pt-[100%] bg-gray-50">
-                <img src="{{ prod.image_url|default:'https://via.placeholder.com/400' }}" alt="{{ prod.name }}" class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <img src="{{ prod.get_image }}" alt="{{ prod.name }}" class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
             </div>
             <!-- Info Area -->
             <div class="p-4 flex-grow flex flex-col">

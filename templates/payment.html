@@ -4,7 +4,7 @@
 <div class="max-w-3xl mx-auto">
     <h1 class="text-3xl font-extrabold text-gray-800 mb-8 border-b pb-4">Pilih Metode Pembayaran <span class="text-primary">#{{ order.id }}</span></h1>
     
-    <form method="POST" action="{% url 'payment' order.id %}" x-data="{ selectedMethod: 'qris' }" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 lg:p-8 mb-8">
+    <form method="POST" action="{% url 'payment' order.id %}" x-data="{ selectedMethod: 'bank_transfer' }" enctype="multipart/form-data" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 lg:p-8 mb-8">
         {% csrf_token %}
         <div class="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-6 mb-8 border border-orange-100 flex justify-between items-center">
             <div>
@@ -17,15 +17,7 @@
         <h3 class="font-bold text-lg text-gray-800 mb-4">Gunakan Metode</h3>
         
         <div class="space-y-4">
-            <label class="block cursor-pointer">
-                <input type="radio" name="payment" value="qris" x-model="selectedMethod" class="sr-only peer">
-                <div class="flex items-center justify-between p-4 rounded-xl border-2 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-sm border-gray-100 hover:border-gray-200 transition">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white rounded border border-gray-200 flex items-center justify-center p-1 font-bold text-xs text-blue-900 shadow-sm">QRIS</div>
-                        <div><h4 class="font-bold text-gray-800">QRIS</h4><p class="text-xs text-gray-500">Scan QR Code dengan e-wallet / m-banking</p></div>
-                    </div>
-                </div>
-            </label>
+
             <label class="block cursor-pointer">
                 <input type="radio" name="payment" value="cod" x-model="selectedMethod" class="sr-only peer">
                 <div class="flex items-center justify-between p-4 rounded-xl border-2 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-sm border-gray-100 hover:border-gray-200 transition">
@@ -35,6 +27,24 @@
                     </div>
                 </div>
             </label>
+            <label class="block cursor-pointer">
+                <input type="radio" name="payment" value="bank_transfer" x-model="selectedMethod" class="sr-only peer">
+                <div class="flex items-center justify-between p-4 rounded-xl border-2 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-sm border-gray-100 hover:border-gray-200 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white rounded border border-gray-200 flex items-center justify-center text-blue-600 text-xl font-bold shadow-sm"><i class="fas fa-university"></i></div>
+                        <div><h4 class="font-bold text-gray-800">Transfer Bank</h4><p class="text-xs text-gray-500">Transfer manual ke rekening toko</p></div>
+                    </div>
+                </div>
+            </label>
+            
+            <div x-show="selectedMethod === 'bank_transfer'" class="mt-4 p-4 border border-blue-200 bg-blue-50 rounded-xl" style="display: none;">
+                <p class="font-bold text-sm text-blue-800 mb-2">Instruksi Transfer:</p>
+                <p class="text-xs text-blue-700 mb-4 border-b border-blue-200 pb-3">Silahkan transfer sejumlah tagihan di atas ke rekening berikut:<br>
+                <strong>BCA: 1234567890 (a.n. Shopiviy)</strong><br>
+                Setelah transfer, upload bukti pembayaran Anda di bawah ini agar pesanan dapat diproses.</p>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Bukti Transfer (Wajib)</label>
+                <input type="file" name="payment_proof" accept="image/*" :required="selectedMethod === 'bank_transfer'" class="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm">
+            </div>
         </div>
         
         <div class="mt-8 border-t border-gray-100 pt-6">
