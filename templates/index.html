@@ -33,52 +33,52 @@
     </div>
     <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
         <!-- Cat Item -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+        <a href="{% url 'product_list' %}?category=pakaian" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-tshirt text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Pakaian</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+        </a>
+        <a href="{% url 'product_list' %}?category=elektronik" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-mobile-alt text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Elektronik</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+        </a>
+        <a href="{% url 'product_list' %}?category=rumah" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-couch text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Rumah</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
+        </a>
+        <a href="{% url 'product_list' %}?category=olahraga" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-basketball-ball text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Olahraga</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden md:flex">
+        </a>
+        <a href="{% url 'product_list' %}?category=komputer" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden md:flex">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-laptop text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Komputer</p>
-        </div>
-        <div class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden lg:flex">
+        </a>
+        <a href="{% url 'product_list' %}?category=aksesoris" class="bg-white p-4 rounded-2xl shadow-sm text-center card-hover cursor-pointer border border-gray-100 flex flex-col items-center justify-center h-32 hidden lg:flex">
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 w-14 h-14 rounded-full flex items-center justify-center mb-2">
                 <i class="fas fa-headphones text-xl text-secondary"></i>
             </div>
             <p class="font-semibold text-gray-700 text-sm">Aksesoris</p>
-        </div>
+        </a>
     </div>
 </div>
 
 <!-- Products Grid -->
 <div>
     <h2 class="text-2xl font-bold mb-6 text-gray-800">Rekomendasi Untukmu</h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6" id="product-grid">
         <!-- Render products dynamically -->
         {% for prod in db_products %}
-        <a href="{% url 'product_detail' prod.id %}" class="bg-white rounded-2xl shadow-sm overflow-hidden card-hover border border-gray-100 flex flex-col group relative block">
+        <a href="{% url 'product_detail' prod.id %}" class="product-item bg-white rounded-2xl shadow-sm overflow-hidden card-hover border border-gray-100 flex flex-col group relative block">
             {% if forloop.first %}
             <!-- Badge untuk produk pertama saja simulasi diskon -->
             <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">-20%</div>

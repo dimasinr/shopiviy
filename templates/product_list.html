@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">
+        {% if current_category %}
+        Produk Kategori: <span class="text-secondary capitalize">{{ current_category }}</span>
+        {% elif search_query %}
+        Hasil pencarian: <span class="text-secondary">{{ search_query }}</span>
+        {% else %}
+        Semua Produk
+        {% endif %}
+    </h1>
+</div>
+
+<div class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar / Filter Form -->
+    <div class="w-full md:w-1/4">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-filter text-secondary"></i> Filter
+            </h2>
+            <form action="{% url 'product_list' %}" method="GET">
+                <!-- Keep search query if it exists -->
+                {% if search_query %}
+                <input type="hidden" name="q" value="{{ search_query }}">
+                {% endif %}
+                
+                <!-- Category Filter -->
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-3">Kategori</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if not current_category %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Semua Kategori</span>
+                        </label>
+                        <!-- Hardcoded categories to match homepage options, or dynamic from DB -->
+                        {% for cat in categories %}
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="{{ cat.name|lower }}" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == cat.name|lower %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition capitalize">{{ cat.name }}</span>
+                        </label>
+                        {% empty %}
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="pakaian" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'pakaian' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Pakaian</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="elektronik" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'elektronik' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Elektronik</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="rumah" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'rumah' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Rumah</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="olahraga" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'olahraga' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Olahraga</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="komputer" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'komputer' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Komputer</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="category" value="aksesoris" class="form-radio text-secondary focus:ring-secondary cursor-pointer" {% if current_category == 'aksesoris' %}checked{% endif %}>
+                            <span class="text-gray-600 group-hover:text-secondary transition">Aksesoris</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Price Range Filter -->
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-700 mb-3">Rentang Harga (Rp)</h3>
+                    <div class="flex flex-col gap-3">
+                        <input type="number" name="min_price" placeholder="Harga Minimum" value="{{ min_price }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary text-sm">
+                        <input type="number" name="max_price" placeholder="Harga Maksimum" value="{{ max_price }}" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary text-sm">
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="w-full bg-secondary text-white font-semibold py-2 rounded-xl shadow hover:bg-opacity-90 transition">
+                        Terapkan
+                    </button>
+                    {% if current_category or search_query or min_price or max_price %}
+                    <a href="{% url 'product_list' %}" class="w-full bg-gray-100 text-gray-700 font-semibold py-2 rounded-xl shadow-sm hover:bg-gray-200 transition text-center flex items-center justify-center">
+                        Reset
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="w-full md:w-3/4">
+        <div class="flex justify-between items-center mb-4">
+            <p class="text-gray-500 text-sm">Menampilkan {{ db_products|length }} produk teratas.</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {% for prod in db_products %}
+            <a href="{% url 'product_detail' prod.id %}" class="product-item bg-white rounded-2xl shadow-sm overflow-hidden card-hover border border-gray-100 flex flex-col group relative block">
+                {% if forloop.first %}
+                <!-- Badge untuk produk pertama saja simulasi diskon -->
+                <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10">-20%</div>
+                {% endif %}
+                <!-- Image Area -->
+                <div class="relative overflow-hidden w-full pt-[100%] bg-gray-50">
+                    <img src="{{ prod.get_image }}" alt="{{ prod.name }}" class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <!-- Info Area -->
+                <div class="p-4 flex-grow flex flex-col">
+                    <p class="text-xs text-gray-400 mb-1 line-clamp-1">{{ prod.seller.profile.store_name|default:prod.seller.username }}</p>
+                    <h3 class="font-medium text-gray-700 mb-1 line-clamp-2 text-sm leading-snug group-hover:text-secondary transition">{{ prod.name }}</h3>
+                    <div class="mt-1 mb-2">
+                        <p class="text-secondary font-extrabold text-lg leading-none">Rp {{ prod.price|floatformat:"0" }}</p>
+                    </div>
+                    <div class="mt-auto pt-2 flex justify-between items-center w-full">
+                        <div class="text-xs text-gray-500 flex items-center font-medium">
+                            <i class="fas fa-star text-yellow-500 mr-1"></i> 4.9 <span class="mx-1">|</span> Stok: {{ prod.stock }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Hover Add to cart button -->
+                <form action="{% url 'add_to_cart' prod.id %}" method="POST" class="absolute bottom-4 right-4 z-20">
+                    {% csrf_token %}
+                    <button type="submit" class="w-9 h-9 bg-secondary text-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 group-hover:opacity-100 transition shadow-lg hover:scale-110">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </form>
+            </a>
+            {% empty %}
+            <div class="col-span-full py-16 flex flex-col items-center justify-center bg-white rounded-2xl border border-gray-100">
+                <i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-bold text-gray-700 mb-1">Produk Tidak Ditemukan</h3>
+                <p class="text-gray-500 text-center max-w-sm">Maaf, tidak ada produk yang sesuai dengan kriteria filter Anda saat ini. Silakan atur ulang filter.</p>
+                <a href="{% url 'product_list' %}" class="mt-6 px-6 py-2 bg-secondary text-white rounded-xl font-medium hover:bg-opacity-90 transition">Lihat Semua Produk</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
