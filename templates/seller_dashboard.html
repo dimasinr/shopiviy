@@ -28,6 +28,9 @@
                 <button @click="tab = 'kategori'" :class="tab === 'kategori' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
                     <i class="fas fa-tags w-5"></i> Kategori
                 </button>
+                <button @click="tab = 'varian'" :class="tab === 'varian' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
+                    <i class="fas fa-swatchbook w-5"></i> Ukuran & Warna
+                </button>
                 <a href="{% url 'chat_seller' %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary font-medium rounded-xl transition text-left">
                     <i class="fas fa-comments w-5"></i> Pesan
                 </a>
@@ -304,6 +307,75 @@
                             </form>
                         </div>
                         {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Varian (Ukuran & Warna) -->
+        <div x-show="tab === 'varian'" x-cloak x-transition.opacity>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Manajemen Ukuran -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-bold text-lg text-gray-800">Manajemen Ukuran</h3>
+                    </div>
+                    <div class="p-6">
+                        <form method="POST" action="{% url 'seller_dashboard' %}" class="flex gap-2 mb-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_size">
+                            <input type="text" name="name" required placeholder="Contoh: 45, XXL" class="flex-grow border-gray-200 border rounded-lg px-4 py-2 focus:ring-1 focus:ring-primary focus:outline-none bg-gray-50">
+                            <button type="submit" class="bg-primary text-white font-bold px-6 py-2 rounded-lg hover:shadow-lg transition">Tambah</button>
+                        </form>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            {% for s in all_sizes %}
+                            <div class="bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full flex items-center gap-2">
+                                <span class="font-bold text-gray-700 text-sm">{{ s.name }}</span>
+                                <form method="POST" action="{% url 'seller_dashboard' %}" onsubmit="return confirm('Hapus ukuran ini?');" class="flex items-center">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_size">
+                                    <input type="hidden" name="size_id" value="{{ s.id }}">
+                                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-times-circle"></i></button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manajemen Warna -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-bold text-lg text-gray-800">Manajemen Warna</h3>
+                    </div>
+                    <div class="p-6">
+                        <form method="POST" action="{% url 'seller_dashboard' %}" class="space-y-4 mb-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_color">
+                            <div class="flex gap-2">
+                                <input type="text" name="name" required placeholder="Nama Warna (e.g. Lime)" class="flex-grow border-gray-200 border rounded-lg px-4 py-2 focus:ring-1 focus:ring-primary focus:outline-none bg-gray-50">
+                                <input type="color" name="color_code" value="#000000" class="w-12 h-10 border-gray-200 border rounded-lg p-1 bg-white cursor-pointer">
+                            </div>
+                            <button type="submit" class="w-full bg-secondary text-white font-bold py-2 rounded-lg hover:shadow-lg transition">Tambah Warna</button>
+                        </form>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for c in all_colors %}
+                            <div class="bg-gray-50 border border-gray-100 p-3 rounded-xl flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 rounded-full border border-gray-200" style="background-color: {{ c.color_code }}"></div>
+                                    <span class="font-bold text-gray-700 text-sm">{{ c.name }}</span>
+                                </div>
+                                <form method="POST" action="{% url 'seller_dashboard' %}" onsubmit="return confirm('Hapus warna ini?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_color">
+                                    <input type="hidden" name="color_id" value="{{ c.id }}">
+                                    <button type="submit" class="text-red-400 hover:text-red-600"><i class="fas fa-trash-alt text-sm"></i></button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

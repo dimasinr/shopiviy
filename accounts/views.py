@@ -149,6 +149,29 @@ def seller_dashboard(request):
             Category.objects.filter(id=cat_id).delete()
             messages.success(request, 'Kategori berhasil dihapus!')
             return redirect('seller_dashboard')
+        elif action == 'add_size':
+            size_name = request.POST.get('name')
+            if size_name:
+                Size.objects.get_or_create(name=size_name)
+                messages.success(request, f'Ukuran {size_name} berhasil ditambahkan!')
+            return redirect('seller_dashboard')
+        elif action == 'delete_size':
+            size_id = request.POST.get('size_id')
+            Size.objects.filter(id=size_id).delete()
+            messages.success(request, 'Ukuran berhasil dihapus!')
+            return redirect('seller_dashboard')
+        elif action == 'add_color':
+            color_name = request.POST.get('name')
+            color_code = request.POST.get('color_code', '#000000')
+            if color_name:
+                Color.objects.get_or_create(name=color_name, defaults={'color_code': color_code})
+                messages.success(request, f'Warna {color_name} berhasil ditambahkan!')
+            return redirect('seller_dashboard')
+        elif action == 'delete_color':
+            color_id = request.POST.get('color_id')
+            Color.objects.filter(id=color_id).delete()
+            messages.success(request, 'Warna berhasil dihapus!')
+            return redirect('seller_dashboard')
         elif action == 'change_password':
             p = request.POST.get('new_password')
             if p:
