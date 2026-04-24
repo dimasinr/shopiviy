@@ -31,6 +31,8 @@ class Product(models.Model):
     stock = models.IntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     image_url = models.URLField(blank=True, null=True) # Fallback URL
+    sizes = models.CharField(max_length=255, blank=True, help_text="e.g. 38, 39, 40, 41, 42")
+    colors = models.CharField(max_length=255, blank=True, help_text="e.g. Black, White, Red")
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

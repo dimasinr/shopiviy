@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Shopiviy{% endblock %}</title>
+    <title>{% block title %}Shopivywear{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#FFC107',
-                        secondary: '#FF9800',
-                        accent: '#FFB300',
-                        bglight: '#f9f9f9',
+                        primary: '#000000',
+                        secondary: '#333333',
+                        accent: '#666666',
+                        bglight: '#ffffff',
                     }
                 }
             }
@@ -24,13 +24,13 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f9f9f9; }
-        .bg-gradient-primary { background: linear-gradient(135deg, #FFC107, #FF9800); }
-        .text-gradient { background: linear-gradient(135deg, #FFC107, #FF9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn-primary { background: linear-gradient(135deg, #FFC107, #FF9800); color: white; transition: all 0.3s ease; }
-        .btn-primary:hover { transform: scale(1.02); box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
-        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
+        body { background-color: #ffffff; color: #111111; }
+        .bg-gradient-primary { background: #000000; }
+        .text-gradient { color: #000000; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-primary { background: #000000; color: white; transition: all 0.3s ease; border: 1px solid #000000; }
+        .btn-primary:hover { background: #ffffff; color: #000000; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; border: 1px solid #eeeeee; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
 <body class="text-gray-800 font-sans flex flex-col min-h-screen">
@@ -42,8 +42,8 @@
 
     {% include 'components/chatbot.html' %}
 
-    <footer class="bg-white border-t py-8 text-center text-gray-500 mt-auto">
-        <p>&copy; 2026 Shopiviy. All rights reserved. Designed with modern clean aesthetic.</p>
+    <footer class="bg-white border-t border-gray-200 py-8 text-center text-gray-500 mt-auto">
+        <p>&copy; 2026 Shopivywear. All rights reserved. Minimalist Black & White Theme.</p>
     </footer>
 </body>
 </html>

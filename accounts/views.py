@@ -68,9 +68,9 @@ def seller_dashboard(request):
         return redirect('home')
         
     # Seed default categories
-    default_cats = ['Pakaian', 'Elektronik', 'Rumah', 'Olahraga', 'Komputer', 'Aksesoris']
+    default_cats = ['Sneakers Pria', 'Sneakers Wanita', 'Loafers', 'Kaos Kaki', 'Perawatan', 'Aksesoris']
     for c in default_cats:
-        Category.objects.get_or_create(name=c, defaults={'slug': c.lower()})
+        Category.objects.get_or_create(name=c, defaults={'slug': c.lower().replace(' ', '-')})
         
     categories = Category.objects.all()
         
@@ -85,9 +85,46 @@ def seller_dashboard(request):
                 name=request.POST.get('name'),
                 price=request.POST.get('price', 0),
                 stock=request.POST.get('stock', 0),
+                sizes=request.POST.get('sizes', ''),
+                colors=request.POST.get('colors', ''),
                 description=request.POST.get('description', ''),
                 image=request.FILES.get('image')
             )
+            return redirect('seller_dashboard')
+        elif action == 'edit_product':
+            product_id = request.POST.get('product_id')
+            product = Product.objects.filter(id=product_id, seller=request.user).first()
+            if product:
+                cat_id = request.POST.get('category')
+                product.category = Category.objects.filter(id=cat_id).first()
+                product.name = request.POST.get('name')
+                product.price = request.POST.get('price', 0)
+                product.stock = request.POST.get('stock', 0)
+                product.sizes = request.POST.get('sizes', '')
+                product.colors = request.POST.get('colors', '')
+                product.description = request.POST.get('description', '')
+                image = request.FILES.get('image')
+                if image:
+                    product.image = image
+                product.save()
+                messages.success(request, 'Produk berhasil diupdate!')
+            return redirect('seller_dashboard')
+        elif action == 'delete_product':
+            product_id = request.POST.get('product_id')
+            Product.objects.filter(id=product_id, seller=request.user).delete()
+            messages.success(request, 'Produk berhasil dihapus!')
+            return redirect('seller_dashboard')
+        elif action == 'add_category':
+            cat_name = request.POST.get('name')
+            if cat_name:
+                from django.utils.text import slugify
+                Category.objects.get_or_create(name=cat_name, defaults={'slug': slugify(cat_name)})
+                messages.success(request, f'Kategori {cat_name} berhasil ditambahkan!')
+            return redirect('seller_dashboard')
+        elif action == 'delete_category':
+            cat_id = request.POST.get('category_id')
+            Category.objects.filter(id=cat_id).delete()
+            messages.success(request, 'Kategori berhasil dihapus!')
             return redirect('seller_dashboard')
         elif action == 'change_password':
             p = request.POST.get('new_password')

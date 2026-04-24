@@ -14,13 +14,13 @@
                 <i class="fas fa-robot text-xl"></i>
             </div>
             <div>
-                <h3 class="font-bold">ShopiBot</h3>
+                <h3 class="font-bold">IvyBot</h3>
                 <p class="text-[10px] opacity-90 inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-400"></span> Asisten Aktif</p>
             </div>
         </div>
 
         <!-- Messages -->
-        <div id="shopibot-container" class="flex-grow p-4 overflow-y-auto bg-gray-50/50 space-y-4 text-sm bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-10">
+        <div id="ivybot-container" class="flex-grow p-4 overflow-y-auto bg-gray-50/50 space-y-4 text-sm bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-10">
             <template x-for="(msg, index) in messages" :key="index">
                 <!-- Wrapper to return either Bot Bubble or User Bubble based on Condition -->
                 <div class="w-full">
@@ -62,7 +62,7 @@ function chatbot() {
         open: false,
         userInput: '',
         messages: [
-            { type: 'bot', text: 'Teeett... Bip! Halo, Saya ShopiBot 🤖.<br><br>Ada yang bisa saya bantu terkait fitur platform E-Commerce Shopiviy hari ini?' }
+            { type: 'bot', text: 'Teeett... Bip! Halo, Saya IvyBot 🤖.<br><br>Ada yang bisa saya bantu terkait fitur toko sepatu Shopivywear hari ini?' }
         ],
         sendMessage() {
             if (this.userInput.trim() === '') return;
@@ -75,20 +75,20 @@ function chatbot() {
         },
         generateReply(text) {
             const t = text.toLowerCase();
-            let reply = "Maaf, ShopiBot masih belajar 😅. Coba tanyakan tentang **resi, cara buka toko seller, metode bayar (COD/QRIS), ongkir, atau apa itu shopiviy**!";
+            let reply = "Maaf, IvyBot masih belajar 😅. Coba tanyakan tentang **resi, cara buka toko seller, metode bayar (COD/QRIS), ongkir, atau apa itu shopivywear**!";
             
-            if (t.includes('apa itu') || t.includes('shopiviy') || t.includes('siapa')) {
-                reply = "<b>Shopiviy</b> adalah platform E-Commerce pintar berbasis Django masa kini! Kamu dapat berbelanja produk eksklusif atau menjadi penjual dengan *Seller Dashboard* yang super responsif.";
+            if (t.includes('apa itu') || t.includes('shopivywear') || t.includes('siapa')) {
+                reply = "<b>Shopivywear</b> adalah toko sepatu modern berbasis Django masa kini! Kamu dapat berbelanja sepatu eksklusif atau menjadi penjual dengan *Seller Dashboard* yang super responsif.";
             } else if (t.includes('resi') || t.includes('lacak') || t.includes('pengiriman')) {
                 reply = "Untuk mengecek resi pengiriman, kamu cukup ke menu <b>Profil</b> > <b>Pesanan Saya</b>, dan klik Detail Invoice. Resi dari kurir seller akan tertera di sana!";
             } else if (t.includes('bayar') || t.includes('metode') || t.includes('cod') || t.includes('qris')) {
-                reply = "Shopiviy sangat modern! Kami mendukung <b>QRIS</b> (Scan dengan e-wallet) dan <b>COD</b> (Bayar tunai di tempat saat barang terima dari kurir).";
+                reply = "Shopivywear sangat modern! Kami mendukung <b>QRIS</b> (Scan dengan e-wallet) dan <b>COD</b> (Bayar tunai di tempat saat barang terima dari kurir).";
             } else if (t.includes('ongkir') || t.includes('ongkos') || t.includes('gratis')) {
                 reply = "Asyik banget! Saat ini kami mensubsidi <b>Gratis Ongkir</b> ke seluruh rute. Jadi biayanya otomatis Rp 0 saat sistem mencetak invoice Checkoutmu.";
             } else if (t.includes('toko') || t.includes('jual') || t.includes('seller')) {
-                reply = "Tertarik jualan? Gampang! Kapanpun saat Register akun baru, pilih rolenya sebagai <b>Penjual</b>. Kamu akan disuguhkan <i>Seller Dashboard</i> canggih untuk upload produk!";
+                reply = "Tertarik jualan? Gampang! Kapanpun saat Register akun baru, pilih rolenya sebagai <b>Penjual</b>. Kamu akan disuguhkan <i>Seller Dashboard</i> canggih untuk upload produk sepatu!";
             } else if (t.includes('halo') || t.includes('hai') || t.includes('pagi') || t.includes('sore') || t.includes('malam') || t.includes('ping')) {
-                reply = "Hai juga kak! Selamat datang di Shopiviy. Beli banyak untung banyak, mau belanja apa kita hari ini?";
+                reply = "Hai juga kak! Selamat datang di Shopivywear. Beli banyak untung banyak, mau belanja sepatu apa kita hari ini?";
             } else if (t.includes('pass') || t.includes('kata sandi')) {
                 reply = "Kamu kelupaan password? Kalau kamu Penjual, kamu bisa ganti passwordmu melalui panel <b>Pengaturan</b> di Dashboard Seller kok.";
             }
@@ -97,7 +97,7 @@ function chatbot() {
         },
         scrollToBottom() {
             setTimeout(() => {
-                const el = document.getElementById('shopibot-container');
+                const el = document.getElementById('ivybot-container');
                 if(el) el.scrollTop = el.scrollHeight;
             }, 50);
         }

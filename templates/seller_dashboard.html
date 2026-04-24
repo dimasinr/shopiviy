@@ -25,6 +25,9 @@
                 <button @click="tab = 'pesanan'" :class="tab === 'pesanan' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
                     <i class="fas fa-clipboard-list w-5"></i> Pesanan <span class="ml-auto bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{{ new_orders }}</span>
                 </button>
+                <button @click="tab = 'kategori'" :class="tab === 'kategori' ? 'bg-primary/10 text-secondary font-bold' : 'text-gray-600 hover:bg-gray-50 hover:text-primary font-medium'" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-left">
+                    <i class="fas fa-tags w-5"></i> Kategori
+                </button>
                 <a href="{% url 'chat_seller' %}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary font-medium rounded-xl transition text-left">
                     <i class="fas fa-comments w-5"></i> Pesan
                 </a>
@@ -102,6 +105,14 @@
                                 <input type="number" name="stock" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
                             </div>
                             <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Ukuran (Opsional)</label>
+                                <input type="text" name="sizes" placeholder="Misal: 38, 39, 40, 41" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
+                                <label class="block text-sm font-bold mb-1 text-gray-600">Warna (Opsional)</label>
+                                <input type="text" name="colors" placeholder="Misal: Hitam, Putih, Merah" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                            </div>
+                            <div class="col-span-2 md:col-span-1">
                                 <label class="block text-sm font-bold mb-1 text-gray-600">Upload Foto Produk</label>
                                 <input type="file" name="image" accept="image/*" class="w-full border-gray-200 border rounded-lg bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-orange-600 p-1">
                             </div>
@@ -117,13 +128,66 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" x-data="{ editModal: false, ep: {} }">
+                    <!-- Edit Modal -->
+                    <div x-show="editModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                        <div @click.away="editModal = false" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+                            <h4 class="font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-edit text-primary"></i> Edit Produk</h4>
+                            <form method="POST" action="{% url 'seller_dashboard' %}" enctype="multipart/form-data" class="grid grid-cols-2 gap-4">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="edit_product">
+                                <input type="hidden" name="product_id" :value="ep.id">
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Nama Produk</label>
+                                    <input type="text" name="name" :value="ep.name" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Kategori</label>
+                                    <select name="category" :value="ep.cat_id" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                        {% for c in categories %}
+                                        <option value="{{ c.id }}">{{ c.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Harga (Rp)</label>
+                                    <input type="number" name="price" :value="ep.price" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Stok</label>
+                                    <input type="number" name="stock" :value="ep.stock" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Ukuran</label>
+                                    <input type="text" name="sizes" :value="ep.sizes" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                </div>
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Warna</label>
+                                    <input type="text" name="colors" :value="ep.colors" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Update Foto (Biarkan kosong jika tidak ingin ganti)</label>
+                                    <input type="file" name="image" accept="image/*" class="w-full border-gray-200 border rounded-lg bg-gray-50 p-1">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-bold mb-1 text-gray-600">Deskripsi</label>
+                                    <textarea name="description" rows="3" x-text="ep.desc" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50"></textarea>
+                                </div>
+                                <div class="col-span-2 flex justify-end gap-2 mt-2">
+                                    <button type="button" @click="editModal = false" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 font-bold hover:bg-gray-100">Batal</button>
+                                    <button type="submit" class="px-4 py-2 btn-primary rounded-lg font-bold">Simpan Perubahan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <table class="w-full text-left text-sm text-gray-600">
                         <thead class="bg-gray-50 border-b border-gray-100 text-gray-700">
                             <tr>
                                 <th class="px-6 py-4 font-bold">Produk</th>
                                 <th class="px-6 py-4 font-bold">Harga</th>
                                 <th class="px-6 py-4 font-bold">Stok</th>
+                                <th class="px-6 py-4 font-bold text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -137,6 +201,15 @@
                                 </td>
                                 <td class="px-6 py-4 font-bold text-secondary">Rp {{ product.price|floatformat:"0" }}</td>
                                 <td class="px-6 py-4 font-bold">{{ product.stock }}</td>
+                                <td class="px-6 py-4 text-right">
+                                    <button @click="ep = {id: '{{ product.id }}', name: '{{ product.name|escapejs }}', cat_id: '{{ product.category.id }}', price: '{{ product.price|floatformat:0 }}', stock: '{{ product.stock }}', sizes: '{{ product.sizes|escapejs }}', colors: '{{ product.colors|escapejs }}', desc: '{{ product.description|escapejs }}'}; editModal = true;" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition"><i class="fas fa-edit"></i></button>
+                                    <form method="POST" action="{% url 'seller_dashboard' %}" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_product">
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <button type="submit" class="text-red-500 hover:bg-red-50 p-2 rounded transition"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">Belum ada produk.</td></tr>
@@ -173,6 +246,37 @@
                     {% empty %}
                     <p class="text-center text-gray-400 py-4">Belum ada pesanan masuk.</p>
                     {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Kategori -->
+        <div x-show="tab === 'kategori'" x-cloak x-transition.opacity>
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+                <div class="p-6 border-b border-gray-100 bg-gray-50">
+                    <h3 class="font-bold text-lg text-gray-800">Manajemen Kategori</h3>
+                </div>
+                <div class="p-6">
+                    <form method="POST" action="{% url 'seller_dashboard' %}" class="flex gap-2 mb-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_category">
+                        <input type="text" name="name" required placeholder="Nama Kategori Baru" class="flex-grow border-gray-200 border rounded-lg px-4 py-2 focus:ring-1 focus:ring-primary focus:outline-none bg-gray-50">
+                        <button type="submit" class="bg-primary text-white font-bold px-6 py-2 rounded-lg hover:shadow-lg transition">Tambah</button>
+                    </form>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {% for c in categories %}
+                        <div class="bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between">
+                            <span class="font-bold text-gray-700">{{ c.name }}</span>
+                            <form method="POST" action="{% url 'seller_dashboard' %}" onsubmit="return confirm('Hapus kategori ini?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_category">
+                                <input type="hidden" name="category_id" value="{{ c.id }}">
+                                <button type="submit" class="text-red-500 hover:text-red-700 p-1"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
