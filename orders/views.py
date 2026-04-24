@@ -10,8 +10,15 @@ def add_to_cart(request, product_id):
     cart, _ = Cart.objects.get_or_create(user=request.user)
     
     qty = int(request.POST.get('quantity', 1))
+    size = request.POST.get('selected_size', '')
+    color = request.POST.get('selected_color', '')
     
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    cart_item, created = CartItem.objects.get_or_create(
+        cart=cart, 
+        product=product,
+        selected_size=size,
+        selected_color=color
+    )
     if not created:
         cart_item.quantity += qty
     else:
@@ -63,11 +70,17 @@ def checkout(request):
         order = Order.objects.create(
             user=request.user,
             total_price=total + shipping_cost,
+            shipping_price=shipping_cost,
             shipping_address=request.POST.get('address', 'Alamat Dummy')
         )
         for item in items:
             OrderItem.objects.create(
-                order=order, product=item.product, quantity=item.quantity, price=item.product.price
+                order=order, 
+                product=item.product, 
+                quantity=item.quantity, 
+                price=item.product.price,
+                selected_size=item.selected_size,
+                selected_color=item.selected_color
             )
         items.delete() # Clear cart
         return redirect('payment', order_id=order.id)

@@ -53,7 +53,7 @@ def logout_view(request):
     return redirect('home')
 
 from django.db.models import Q, Sum, F
-from products.models import Product, Category
+from products.models import Product, Category, Size, Color
 from orders.models import OrderItem, Order
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
@@ -67,29 +67,47 @@ def seller_dashboard(request):
     if not getattr(request.user.profile, 'is_seller', False):
         return redirect('home')
         
-    # Seed default categories
+    # Seed default categories, sizes, and colors
     default_cats = ['Sneakers Pria', 'Sneakers Wanita', 'Loafers', 'Kaos Kaki', 'Perawatan', 'Aksesoris']
     for c in default_cats:
         Category.objects.get_or_create(name=c, defaults={'slug': c.lower().replace(' ', '-')})
         
+    default_sizes = ['38', '39', '40', '41', '42', '43', '44', 'S', 'M', 'L', 'XL']
+    for s in default_sizes:
+        Size.objects.get_or_create(name=s)
+        
+    default_colors = [
+        ('Hitam', '#000000'), ('Putih', '#FFFFFF'), ('Merah', '#FF0000'), 
+        ('Biru', '#0000FF'), ('Abu-abu', '#808080'), ('Navy', '#000080'),
+        ('Cokelat', '#8B4513'), ('Hijau', '#008000')
+    ]
+    for c_name, c_code in default_colors:
+        Color.objects.get_or_create(name=c_name, defaults={'color_code': c_code})
+
     categories = Category.objects.all()
+    all_sizes = Size.objects.all()
+    all_colors = Color.objects.all()
         
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'add_product':
             cat_id = request.POST.get('category')
             cat = Category.objects.filter(id=cat_id).first()
-            Product.objects.create(
+            product = Product.objects.create(
                 seller=request.user,
                 category=cat,
                 name=request.POST.get('name'),
                 price=request.POST.get('price', 0),
                 stock=request.POST.get('stock', 0),
-                sizes=request.POST.get('sizes', ''),
-                colors=request.POST.get('colors', ''),
                 description=request.POST.get('description', ''),
                 image=request.FILES.get('image')
             )
+            # Handle ManyToMany
+            size_ids = request.POST.getlist('sizes')
+            color_ids = request.POST.getlist('colors')
+            product.sizes.set(size_ids)
+            product.colors.set(color_ids)
+            
             return redirect('seller_dashboard')
         elif action == 'edit_product':
             product_id = request.POST.get('product_id')
@@ -100,13 +118,18 @@ def seller_dashboard(request):
                 product.name = request.POST.get('name')
                 product.price = request.POST.get('price', 0)
                 product.stock = request.POST.get('stock', 0)
-                product.sizes = request.POST.get('sizes', '')
-                product.colors = request.POST.get('colors', '')
                 product.description = request.POST.get('description', '')
                 image = request.FILES.get('image')
                 if image:
                     product.image = image
                 product.save()
+                
+                # Update ManyToMany
+                size_ids = request.POST.getlist('sizes')
+                color_ids = request.POST.getlist('colors')
+                product.sizes.set(size_ids)
+                product.colors.set(color_ids)
+                
                 messages.success(request, 'Produk berhasil diupdate!')
             return redirect('seller_dashboard')
         elif action == 'delete_product':
@@ -145,7 +168,7 @@ def seller_dashboard(request):
                     messages.success(request, f'Status pesanan #{order.id} berhasil diperbarui menjadi {new_status}.')
             return redirect('seller_dashboard')
         
-    my_products = Product.objects.filter(seller=request.user).order_by('-created_at')
+    my_products = Product.objects.filter(seller=request.user).order_by('-created_at').prefetch_related('sizes', 'colors')
     
     total_products = my_products.count()
     revenue = OrderItem.objects.filter(product__seller=request.user, order__status__in=['paid', 'completed', 'shipped']).aggregate(total=Sum(F('price') * F('quantity')))['total'] or 0
@@ -159,7 +182,9 @@ def seller_dashboard(request):
         'revenue': revenue,
         'new_orders': new_orders_count,
         'recent_order_items': recent_order_items,
-        'categories': categories
+        'categories': categories,
+        'all_sizes': all_sizes,
+        'all_colors': all_colors
     })
 
 @login_required

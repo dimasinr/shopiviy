@@ -33,7 +33,15 @@
                 <img src="{{ item.product.get_image }}" class="w-16 h-16 rounded-lg object-cover border border-gray-100">
                 <div class="flex-grow">
                     <h4 class="font-bold text-gray-800 line-clamp-1 text-sm">{{ item.product.name }}</h4>
-                    <p class="text-xs text-gray-500 mb-1">Total: {{ item.quantity }} Barang</p>
+                    <div class="flex flex-wrap gap-2 mt-0.5">
+                        {% if item.selected_size %}
+                        <span class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded font-bold text-gray-500 uppercase">{{ item.selected_size }}</span>
+                        {% endif %}
+                        {% if item.selected_color %}
+                        <span class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded font-bold text-gray-500 uppercase">{{ item.selected_color }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Jumlah: {{ item.quantity }}</p>
                     <div class="flex justify-between mt-1">
                         <span class="font-bold text-secondary text-sm">Rp {% widthratio item.product.price 1 item.quantity %}</span>
                     </div>
@@ -78,12 +86,11 @@
         </div>
     </div>
 </form>
-</form>
 
 <script>
     const TOKO_LAT = -6.28862; // Tangerang Selatan Lat
     const TOKO_LNG = 106.71789; // Tangerang Selatan Lng
-    const TOTAL_BARANG = parseInt("{{ total|floatformat:'0' }}");
+    const TOTAL_BARANG = parseInt("{{ total|floatformat:'0' }}".replace(/[^\d]/g, ''));
     
     function distance(lat1, lon1, lat2, lon2) {
       if ((lat1 == lat2) && (lon1 == lon2)) {

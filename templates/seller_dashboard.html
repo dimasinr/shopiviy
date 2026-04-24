@@ -105,12 +105,26 @@
                                 <input type="number" name="stock" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
                             </div>
                             <div class="col-span-2 md:col-span-1">
-                                <label class="block text-sm font-bold mb-1 text-gray-600">Ukuran (Opsional)</label>
-                                <input type="text" name="sizes" placeholder="Misal: 38, 39, 40, 41" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                                <label class="block text-sm font-bold mb-2 text-gray-600">Ukuran</label>
+                                <div class="flex flex-wrap gap-2 p-3 bg-white border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                                    {% for s in all_sizes %}
+                                    <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 hover:border-primary/30 hover:bg-primary/5 cursor-pointer transition">
+                                        <input type="checkbox" name="sizes" value="{{ s.id }}" class="rounded text-primary focus:ring-primary">
+                                        <span class="text-xs font-bold text-gray-700">{{ s.name }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
                             </div>
                             <div class="col-span-2 md:col-span-1">
-                                <label class="block text-sm font-bold mb-1 text-gray-600">Warna (Opsional)</label>
-                                <input type="text" name="colors" placeholder="Misal: Hitam, Putih, Merah" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-white">
+                                <label class="block text-sm font-bold mb-2 text-gray-600">Warna</label>
+                                <div class="flex flex-wrap gap-2 p-3 bg-white border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                                    {% for c in all_colors %}
+                                    <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 hover:border-primary/30 hover:bg-primary/5 cursor-pointer transition">
+                                        <input type="checkbox" name="colors" value="{{ c.id }}" class="rounded text-primary focus:ring-primary">
+                                        <span class="text-xs font-bold text-gray-700">{{ c.name }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
                             </div>
                             <div class="col-span-2 md:col-span-1">
                                 <label class="block text-sm font-bold mb-1 text-gray-600">Upload Foto Produk</label>
@@ -158,12 +172,26 @@
                                     <input type="number" name="stock" :value="ep.stock" required class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
                                 </div>
                                 <div class="col-span-2 md:col-span-1">
-                                    <label class="block text-sm font-bold mb-1 text-gray-600">Ukuran</label>
-                                    <input type="text" name="sizes" :value="ep.sizes" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                    <label class="block text-sm font-bold mb-2 text-gray-600">Ukuran</label>
+                                    <div class="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                                        {% for s in all_sizes %}
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 hover:border-primary/30 hover:bg-primary/5 cursor-pointer transition">
+                                            <input type="checkbox" name="sizes" value="{{ s.id }}" :checked="ep.sizes.includes('{{ s.id }}')" class="rounded text-primary focus:ring-primary">
+                                            <span class="text-xs font-bold text-gray-700">{{ s.name }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                                 <div class="col-span-2 md:col-span-1">
-                                    <label class="block text-sm font-bold mb-1 text-gray-600">Warna</label>
-                                    <input type="text" name="colors" :value="ep.colors" class="w-full border-gray-200 border rounded-lg px-3 py-2 bg-gray-50">
+                                    <label class="block text-sm font-bold mb-2 text-gray-600">Warna</label>
+                                    <div class="flex flex-wrap gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg max-h-40 overflow-y-auto">
+                                        {% for c in all_colors %}
+                                        <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-100 hover:border-primary/30 hover:bg-primary/5 cursor-pointer transition">
+                                            <input type="checkbox" name="colors" value="{{ c.id }}" :checked="ep.colors.includes('{{ c.id }}')" class="rounded text-primary focus:ring-primary">
+                                            <span class="text-xs font-bold text-gray-700">{{ c.name }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                                 <div class="col-span-2">
                                     <label class="block text-sm font-bold mb-1 text-gray-600">Update Foto (Biarkan kosong jika tidak ingin ganti)</label>
@@ -202,7 +230,7 @@
                                 <td class="px-6 py-4 font-bold text-secondary">Rp {{ product.price|floatformat:"0" }}</td>
                                 <td class="px-6 py-4 font-bold">{{ product.stock }}</td>
                                 <td class="px-6 py-4 text-right">
-                                    <button @click="ep = {id: '{{ product.id }}', name: '{{ product.name|escapejs }}', cat_id: '{{ product.category.id }}', price: '{{ product.price|floatformat:0 }}', stock: '{{ product.stock }}', sizes: '{{ product.sizes|escapejs }}', colors: '{{ product.colors|escapejs }}', desc: '{{ product.description|escapejs }}'}; editModal = true;" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition"><i class="fas fa-edit"></i></button>
+                                    <button @click="ep = {id: '{{ product.id }}', name: '{{ product.name|escapejs }}', cat_id: '{{ product.category.id }}', price: '{{ product.price|floatformat:0 }}', stock: '{{ product.stock }}', sizes: [{% for s in product.sizes.all %}'{{ s.id }}',{% endfor %}], colors: [{% for c in product.colors.all %}'{{ c.id }}',{% endfor %}], desc: '{{ product.description|escapejs }}'}; editModal = true;" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition"><i class="fas fa-edit"></i></button>
                                     <form method="POST" action="{% url 'seller_dashboard' %}" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="delete_product">

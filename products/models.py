@@ -2,6 +2,19 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 
+class Size(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+class Color(models.Model):
+    name = models.CharField(max_length=50)
+    color_code = models.CharField(max_length=7, help_text="Hex code, e.g. #000000", blank=True)
+
+    def __str__(self):
+        return self.name
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, blank=True)
@@ -31,8 +44,8 @@ class Product(models.Model):
     stock = models.IntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     image_url = models.URLField(blank=True, null=True) # Fallback URL
-    sizes = models.CharField(max_length=255, blank=True, help_text="e.g. 38, 39, 40, 41, 42")
-    colors = models.CharField(max_length=255, blank=True, help_text="e.g. Black, White, Red")
+    sizes = models.ManyToManyField(Size, blank=True)
+    colors = models.ManyToManyField(Color, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

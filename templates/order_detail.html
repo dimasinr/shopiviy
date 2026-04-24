@@ -34,7 +34,15 @@
                     <img src="{{ item.product.get_image }}" class="w-20 h-20 rounded-xl object-cover border border-gray-100">
                     <div class="flex-grow">
                         <h4 class="font-bold text-gray-800 line-clamp-1">{{ item.product.name }}</h4>
-                        <p class="text-xs text-gray-500 mb-2">{{ item.quantity }} x Rp {{ item.price|floatformat:"0" }}</p>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            {% if item.selected_size %}
+                            <span class="px-2 py-0.5 bg-gray-50 text-[10px] font-bold rounded border border-gray-100 text-gray-600 uppercase">Size: {{ item.selected_size }}</span>
+                            {% endif %}
+                            {% if item.selected_color %}
+                            <span class="px-2 py-0.5 bg-gray-50 text-[10px] font-bold rounded border border-gray-100 text-gray-600 uppercase">Color: {{ item.selected_color }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 mb-2">{{ item.quantity }} x Rp {{ item.price|floatformat:"0" }}</p>
                         <p class="font-extrabold text-secondary">Rp {% widthratio item.price 1 item.quantity %}</p>
                     </div>
                 </div>
@@ -67,14 +75,19 @@
             <!-- Payment Info -->
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-24">
                 <h3 class="font-bold text-gray-800 mb-4 border-b pb-3">Rincian Pembayaran</h3>
-                <div class="space-y-3 text-sm mb-4 border-b pb-4">
-                    <div class="flex justify-between text-gray-600">
-                        <span>Metode / Status</span>
-                        <span class="font-bold text-gray-800 uppercase">{{ order.payment_method }} / {{ order.status }}</span>
+                <!-- Rincian Pembayaran -->
+                <div class="space-y-2 text-sm mb-4 border-b pb-4">
+                    <div class="flex justify-between text-gray-500">
+                        <span>Metode Pembayaran</span>
+                        <span class="font-bold text-gray-700 uppercase">{{ order.payment_method|default:"Belum Dipilih" }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-500">
+                        <span>Biaya Pengiriman</span>
+                        <span class="font-bold text-gray-700">Rp {{ order.shipping_price|floatformat:0 }}</span>
                     </div>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="font-bold text-gray-800">Total Nominal</span>
+                    <span class="font-bold text-gray-800">Total Tagihan</span>
                     <span class="font-extrabold text-xl text-secondary">Rp {{ order.total_price|floatformat:"0" }}</span>
                 </div>
                 
